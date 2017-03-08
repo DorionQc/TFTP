@@ -23,5 +23,7 @@ namespace TFTP_Client_Serveur.Paquet
         public RRQPaquet(string Fichier) : base(Fichier, TypePaquet.RRQ)
         { }
 
+        public RRQPaquet() { }
+
     }
 }

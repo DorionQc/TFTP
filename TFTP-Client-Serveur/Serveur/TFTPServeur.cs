@@ -138,7 +138,7 @@ namespace TFTP_Client_Serveur.Serveur
             m_Running.Reset();
 
             // Tampon de réception
-            byte[] buffer = new byte[64];
+            byte[] buffer = new byte[512];
             int len = 0;
 
             absPaquet paquet;
@@ -167,17 +167,18 @@ namespace TFTP_Client_Serveur.Serveur
                             {
                                 if (paquet.Type == TypePaquet.RRQ)
                                 {
-                                    m_lConnection.Add(new ServeurRRQ(((RRQPaquet)paquet).Fichier,
+                                    m_lConnection.Add(new ServeurRRQ(Path.Combine(m_Dossier.FullName, ((RRQPaquet)paquet).Fichier),
                                         DistantEP,
                                         new IPEndPoint(((IPEndPoint)m_LocalEP).Address, 0)));
                                 }
                                 else if (paquet.Type == TypePaquet.WRQ)
                                 {
-
+                                    
                                 }
                                 else
                                 {
                                     logger.Log(ConsoleSource.Serveur, "Un message illisible a été transmis.");
+                                    // TODO - Envoyer un message d'erreur
                                 }
                             }
                             else

@@ -21,6 +21,8 @@ namespace TFTP_Client_Serveur.Paquet
 
         private short m_NoBlock;
 
+        public AckPaquet() { }
+
         public AckPaquet(short NoBlock) : base(TypePaquet.ACK)
         {
             m_NoBlock = NoBlock;
@@ -38,6 +40,8 @@ namespace TFTP_Client_Serveur.Paquet
                 return false;
             if (Data[0] != 0 || Data[1] != (byte)TypePaquet.ACK)
                 return false;
+            this.Type = TypePaquet.ACK;
+
             m_NoBlock = BitConverter.ToInt16(Data, 2);
             return true;
         }

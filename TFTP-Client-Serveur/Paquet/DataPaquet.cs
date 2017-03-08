@@ -23,6 +23,8 @@ namespace TFTP_Client_Serveur.Paquet
         private byte[] m_Data;
         private bool m_Dernier;
 
+        public DataPaquet() { }
+
         public DataPaquet(short NoBlock, byte[] Data) : base(TypePaquet.DATA)
         {
             m_NoBlock = NoBlock;
@@ -72,6 +74,7 @@ namespace TFTP_Client_Serveur.Paquet
             {
                 m_Data = new byte[0];
             }
+            this.Type = TypePaquet.DATA;
             return true;
 
 

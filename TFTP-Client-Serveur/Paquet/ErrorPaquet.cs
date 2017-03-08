@@ -34,6 +34,8 @@ namespace TFTP_Client_Serveur.Paquet
         private CodeErreur m_CodeErreur;
         private string m_MessageErreur;
 
+        public ErrorPaquet() { }
+
         public ErrorPaquet(CodeErreur CodeErreur, string MessageErreur) : base(TypePaquet.ERROR)
         {
             m_CodeErreur = CodeErreur;
@@ -73,6 +75,7 @@ namespace TFTP_Client_Serveur.Paquet
                 return false;
             m_CodeErreur = (CodeErreur)CodeErreur;
             m_MessageErreur = sb.ToString();
+            this.Type = TypePaquet.ERROR;
             return true;
         }
 

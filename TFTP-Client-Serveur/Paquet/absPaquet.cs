@@ -22,10 +22,13 @@ namespace TFTP_Client_Serveur.Paquet
         ACK = 4,
         ERROR = 5
     };
+
     public abstract class absPaquet
     {
-        public readonly TypePaquet Type;
+        public TypePaquet Type;
         
+        public absPaquet() { }
+
         public absPaquet(TypePaquet Type)
         {
             this.Type = Type;
@@ -57,11 +60,12 @@ namespace TFTP_Client_Serveur.Paquet
                         Paquet = (absPaquet)paquetInst;
                         if (!Paquet.Decode(Data))
                             return false;
+                        return true;
                     }
                 }
             }
 
-            return true;
+            return false;
         }
 
         public static bool Encoder(absPaquet Paquet, out byte[] Data)

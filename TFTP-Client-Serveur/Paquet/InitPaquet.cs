@@ -18,6 +18,8 @@ namespace TFTP_Client_Serveur.Paquet
         private string m_Fichier;
         private string m_Mode;
 
+        public InitPaquet() { }
+
         public InitPaquet(string Fichier, TypePaquet type) : base(type)
         {
             m_Fichier = Fichier;
@@ -39,7 +41,7 @@ namespace TFTP_Client_Serveur.Paquet
             
             if (Data.Length < 2)
                 return false;
-            if (Data[0] != 0 || Data[1] != (byte)TypePaquet.RRQ)
+            if (Data[0] != 0 || Data[1] > 2 || Data[1] < 1)
                 return false;
             int i = 2;
             StringBuilder sb = new StringBuilder();
@@ -58,11 +60,13 @@ namespace TFTP_Client_Serveur.Paquet
                 sb.Append((char)Data[i]);
                 i++;
             }
-            if (i != Data.Length || sb.ToString() != "octet" || Fichier == "")
+            if (sb.ToString() != "octet" || Fichier == "")
                 return false;
 
             m_Fichier = Fichier;
             m_Mode = sb.ToString();
+
+            this.Type = (TypePaquet)Data[1];
 
             return true;
         }

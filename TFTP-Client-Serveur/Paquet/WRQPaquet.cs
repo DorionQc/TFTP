@@ -20,5 +20,7 @@ namespace TFTP_Client_Serveur.Paquet
 
         public WRQPaquet(string Fichier) : base(Fichier, TypePaquet.WRQ)
         { }
+
+        public WRQPaquet() { }
     }
 }
