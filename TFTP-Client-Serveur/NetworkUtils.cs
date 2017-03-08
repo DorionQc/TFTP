@@ -15,15 +15,6 @@ using System.Net.Sockets;
 
 namespace TFTP_Client_Serveur
 {
-    public enum TypePaquet : byte
-    {
-        NULL = 0,
-        RRQ = 1,
-        WRQ = 2,
-        DATA = 3,
-        ACK = 4,
-        ERROR = 5
-    };
     public static class NetworkUtils
     {
         /// <summary>

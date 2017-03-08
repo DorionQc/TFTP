@@ -1,4 +1,10 @@
-﻿using System;
+﻿/***********************************
+ * Samuel Goulet
+ * Serveur TFTP
+ * 2017
+ **********************************/
+ 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace TFTP_Client_Serveur.Paquet
 {
+    // Classe abstraite de laquelle hérite RRQ et WRQ
     public abstract class InitPaquet : absPaquet
     {
         private string m_Fichier;
