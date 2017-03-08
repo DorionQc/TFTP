@@ -33,6 +33,9 @@ namespace TFTP_Client_Serveur.Serveur
             int len;
             byte[] buffer = new byte[516];
             short NumeroPaquet = 0;
+            absPaquet paquet;
+            AckPaquet ack;
+            TimeSpan temps = new TimeSpan();
 
 
             // Au cas où...
@@ -72,7 +75,18 @@ namespace TFTP_Client_Serveur.Serveur
                     Thread.Sleep(0);
                 else
                 {
-                    
+                    len = this.Socket.ReceiveFrom(buffer, 0, 64, SocketFlags.None, ref m_DistantEP);
+                    if (len != 0 && absPaquet.Decoder(buffer, out paquet))
+                    {
+                        if (paquet.Type == TypePaquet.ACK)
+                        {
+                            ack = (AckPaquet)paquet;
+                            if (ack.NoBlock == NumeroPaquet)
+                            {
+
+                            }
+                        }
+                    }
                 }
             }
         }
