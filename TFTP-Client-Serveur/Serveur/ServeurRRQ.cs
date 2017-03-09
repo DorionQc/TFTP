@@ -31,11 +31,15 @@ namespace TFTP_Client_Serveur.Serveur
         protected override void Communication()
         {
             int len;
+            bool AckRecu;
             byte[] buffer = new byte[516];
-            short NumeroPaquet = 0;
-            absPaquet paquet;
+            short NumeroPaquet = 1;
+            byte NbEssais = 0;
+            this.Continuer = true;
+            absPaquet recu;
             AckPaquet ack;
-            TimeSpan temps = new TimeSpan();
+            DataPaquet data;
+            DateTime temps;
 
 
             // Au cas où...
@@ -47,8 +51,7 @@ namespace TFTP_Client_Serveur.Serveur
 
             if (!File.Exists(m_NomFichier))
             {
-                new ErrorPaquet(CodeErreur.FileNotFound, "Impossible de trouver le fichier").Encode(out buffer);
-                this.Socket.SendTo(buffer, m_DistantEP);
+                Envoyer(new ErrorPaquet(CodeErreur.FileNotFound, "Impossible de trouver le fichier"));
                 return;
             }
             try {
@@ -57,33 +60,43 @@ namespace TFTP_Client_Serveur.Serveur
             }
             catch (Exception ex)
             {
-                new ErrorPaquet(CodeErreur.AccessViolation, "Erreur lors de la lecture du fichier : " + ex.Message).Encode(out buffer);
-                this.Socket.SendTo(buffer, m_DistantEP);
+                Envoyer(new ErrorPaquet(CodeErreur.AccessViolation, "Erreur lors de la lecture du fichier : " + ex.Message));
                 return;
             }
             BinaryReader br = new BinaryReader(m_fs);
 
-
-            // Envoi du premier paquet
-            new DataPaquet(NumeroPaquet, SeparerFichier(NumeroPaquet)).Encode(out buffer);
-            this.Socket.SendTo(buffer, m_DistantEP);
-            NumeroPaquet++;
-
             while (this.Continuer)
             {
-                if (this.Socket.Available == 0)
-                    Thread.Sleep(0);
-                else
-                {
-                    len = this.Socket.ReceiveFrom(buffer, 0, 64, SocketFlags.None, ref m_DistantEP);
-                    if (len != 0 && absPaquet.Decoder(buffer, out paquet))
-                    {
-                        if (paquet.Type == TypePaquet.ACK)
-                        {
-                            ack = (AckPaquet)paquet;
-                            if (ack.NoBlock == NumeroPaquet)
-                            {
+                // Envoi des données
+                data = new DataPaquet(NumeroPaquet, SeparerFichier(NumeroPaquet));
+                Envoyer(data);
+                temps = DateTime.Now;
+                AckRecu = false;
+                NbEssais++;
 
+                while (!AckRecu && DateTime.Now.Millisecond - temps.Millisecond < 5000)
+                {
+                    if (this.Socket.Available == 0)
+                        Thread.Sleep(0);
+                    else
+                    {
+                        len = this.Socket.ReceiveFrom(buffer, ref m_DistantEP);
+                        if (len != 0 && absPaquet.Decoder(buffer, out recu))
+                        {
+                            if (recu.Type == TypePaquet.ACK && ((AckPaquet)recu).NoBlock == NumeroPaquet)
+                            {
+                                logger.Log(ConsoleSource.Serveur, "Réception du ACK du paquet #" + ((AckPaquet)recu).NoBlock.ToString());
+                                AckRecu = true;
+                                NbEssais = 0;
+                                NumeroPaquet++;
+                                if (data.EstDernier)
+                                    this.Continuer = false;
+                            }
+                            else if (recu.Type == TypePaquet.ERROR)
+                            {
+                                logger.Log(ConsoleSource.Serveur, "Erreur reçue.");
+                                logger.Log(ConsoleSource.Serveur, ((ErrorPaquet)recu).MessageErreur);
+                                this.Continuer = false;
                             }
                         }
                     }

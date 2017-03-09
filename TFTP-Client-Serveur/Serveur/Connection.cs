@@ -106,6 +106,7 @@ namespace TFTP_Client_Serveur.Serveur
 
         protected byte[] SeparerFichier(int NoPaquet)
         {
+            NoPaquet--;
             if (m_fs.Length < NoPaquet * 512)
                 return null;
             else if (m_fs.Length == NoPaquet * 512)
@@ -122,6 +123,14 @@ namespace TFTP_Client_Serveur.Serveur
                     return m_br.ReadBytes((int)(m_fs.Length - (NoPaquet * 512)));
                 }
             }
+        }
+
+        protected void Envoyer(absPaquet paquet)
+        {
+            byte[] Data;
+            paquet.Encode(out Data);
+            this.Socket.SendTo(Data, m_DistantEP);
+            logger.Log(ConsoleSource.Serveur, "Envoi du packet " + paquet.ToString());
         }
 
     }

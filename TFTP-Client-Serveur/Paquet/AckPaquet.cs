@@ -36,13 +36,13 @@ namespace TFTP_Client_Serveur.Paquet
 
         public override bool Decode(byte[] Data)
         {
-            if (Data.Length != 4)
+            if (Data.Length < 4)
                 return false;
             if (Data[0] != 0 || Data[1] != (byte)TypePaquet.ACK)
                 return false;
             this.Type = TypePaquet.ACK;
 
-            m_NoBlock = BitConverter.ToInt16(Data, 2);
+            m_NoBlock = (short)((Data[2] << 8) + Data[3]);
             return true;
         }
 
