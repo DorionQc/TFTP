@@ -101,10 +101,12 @@ namespace TFTP_Client_Serveur.Serveur
                 return;
             this.Continuer = false;
             this.Event.WaitOne();
+            if (m_br != null) m_br.Close();
+            if (m_fs != null) m_fs.Close();
             logger.Log(ConsoleSource.Serveur, "La connection vers " + m_DistantEP.ToString() + " est terminée");
         }
 
-        protected byte[] SeparerFichier(int NoPaquet)
+        protected byte[] SeparerFichier(long NoPaquet)
         {
             NoPaquet--;
             if (m_fs.Length < NoPaquet * 512)

@@ -33,7 +33,7 @@ namespace TFTP_Client_Serveur.Serveur
             int len;
             bool AckRecu;
             byte[] buffer = new byte[516];
-            short NumeroPaquet = 1;
+            long NumeroPaquet = 1;
             byte NbEssais = 0;
             this.Continuer = true;
             absPaquet recu;
@@ -68,7 +68,7 @@ namespace TFTP_Client_Serveur.Serveur
             while (this.Continuer)
             {
                 // Envoi des données
-                data = new DataPaquet(NumeroPaquet, SeparerFichier(NumeroPaquet));
+                data = new DataPaquet((short)NumeroPaquet, SeparerFichier(NumeroPaquet));
                 Envoyer(data);
                 temps = DateTime.Now;
                 AckRecu = false;
@@ -83,7 +83,7 @@ namespace TFTP_Client_Serveur.Serveur
                         len = this.Socket.ReceiveFrom(buffer, ref m_DistantEP);
                         if (len != 0 && absPaquet.Decoder(buffer, out recu))
                         {
-                            if (recu.Type == TypePaquet.ACK && ((AckPaquet)recu).NoBlock == NumeroPaquet)
+                            if (recu.Type == TypePaquet.ACK && ((AckPaquet)recu).NoBlock == (short)NumeroPaquet)
                             {
                                 logger.Log(ConsoleSource.Serveur, "Réception du ACK du paquet #" + ((AckPaquet)recu).NoBlock.ToString());
                                 AckRecu = true;
@@ -102,6 +102,8 @@ namespace TFTP_Client_Serveur.Serveur
                     }
                 }
             }
+
+            Terminer();
         }
     }
 }
