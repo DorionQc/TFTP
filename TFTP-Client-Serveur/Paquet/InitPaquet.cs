@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 namespace TFTP_Client_Serveur.Paquet
 {
     // Classe abstraite de laquelle hérite RRQ et WRQ
+    [ChampPaquet("Fichier", 1, typeof(char[]), '\0')]
+    [ChampPaquet("Mode", 2, typeof(char[]), '\0')]
     public abstract class InitPaquet : absPaquet
     {
         private string m_Fichier;

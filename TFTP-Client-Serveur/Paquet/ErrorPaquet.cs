@@ -25,12 +25,12 @@ namespace TFTP_Client_Serveur.Paquet
         NoSuchUser = 7
     };
 
+    [ChampPaquet("ErrorCode", 1, typeof(short))]
+    [ChampPaquet("ErrorMessage", 2, typeof(char[]), EndValue: '\0')]
     [TypePaquet(TypePaquet.ERROR)]
     public class ErrorPaquet : absPaquet
     {
-        /*// Ce champ doit OBLIGATOIREMENT exister pour que le paquet soit reconnu.
-        public static TypePaquet TYPEPAQUET = TypePaquet.ERROR;*/
-
+        
         private CodeErreur m_CodeErreur;
         private string m_MessageErreur;
 

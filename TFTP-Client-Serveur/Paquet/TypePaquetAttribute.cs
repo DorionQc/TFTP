@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace TFTP_Client_Serveur.Paquet
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public sealed class TypePaquetAttribute : Attribute
     {
         private readonly TypePaquet m_Type;

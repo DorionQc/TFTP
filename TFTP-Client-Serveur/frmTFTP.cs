@@ -18,6 +18,7 @@ using System.Net;
 
 //using TFTP_Client_Serveur.Client;
 using TFTP_Client_Serveur.Serveur;
+using TFTP_Client_Serveur.Paquet;
 
 namespace TFTP_Client_Serveur
 {
@@ -119,6 +120,8 @@ namespace TFTP_Client_Serveur
 
         private void btnEnvoyerClient_Click(object sender, EventArgs e)
         {
+            absPaquet paq;
+            absPaquet.Decoder(new byte[] { 0, 3, 0, 2, 1, 1, 1, 1}, out paq);
 
         }
 

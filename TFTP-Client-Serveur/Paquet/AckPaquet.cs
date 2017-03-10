@@ -13,12 +13,11 @@ using System.Runtime.InteropServices;
 
 namespace TFTP_Client_Serveur.Paquet
 {
+    [ChampPaquet("NumeroPaquet", 1, typeof(short))]
     [TypePaquet(TypePaquet.ACK)]
     public class AckPaquet : absPaquet
     {
-        /*// Ce champ doit OBLIGATOIREMENT exister pour que le paquet soit reconnu.
-        public static TypePaquet TYPEPAQUET = TypePaquet.ACK;*/
-
+        
         private short m_NoBlock;
 
         public AckPaquet() { }
@@ -55,5 +54,6 @@ namespace TFTP_Client_Serveur.Paquet
             Data[3] = (byte)(m_NoBlock & 0xff);
             return true;
         }
+        
     }
 }

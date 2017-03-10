@@ -55,6 +55,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="NetworkUtils.cs" />
     <Compile Include="Paquet\AckPaquet.cs" />
+    <Compile Include="Paquet\ChampPaquetAttribute.cs" />
     <Compile Include="Paquet\DataPaquet.cs" />
     <Compile Include="Paquet\ErrorPaquet.cs" />
     <Compile Include="Paquet\InitPaquet.cs" />

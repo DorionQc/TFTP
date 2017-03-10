@@ -13,12 +13,12 @@ using System.Runtime.InteropServices;
 
 namespace TFTP_Client_Serveur.Paquet
 {
+    [ChampPaquet("Block", 1, typeof(short))]
+    [ChampPaquet("Data", 2, typeof(byte[]), MaxLength: 512)]
     [TypePaquet(TypePaquet.DATA)]
     public class DataPaquet : absPaquet
     {
-        /*// Ce champ doit OBLIGATOIREMENT exister pour que le paquet soit reconnu.
-        public static TypePaquet TYPEPAQUET = TypePaquet.DATA;*/
-
+        
         private short m_NoBlock;
         private byte[] m_Data;
         private bool m_Dernier;
