@@ -104,7 +104,6 @@ namespace TFTP_Client_Serveur.Paquet
                     else
                         Taille = Data.Length - Pos;
                 }
-                Logger.INSTANCE.Log(ConsoleSource.Interface, att.ToString() + " ||| Taille = " + Taille.ToString());
 
                 Valeurs[i] = getValue(att, Data, ref Pos);
 
