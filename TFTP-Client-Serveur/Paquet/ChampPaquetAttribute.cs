@@ -17,6 +17,7 @@ namespace TFTP_Client_Serveur.Paquet
         private readonly object m_EndValue;
         private readonly int m_MaxLength;
         private readonly Type m_endValueType;
+        private readonly bool m_isCollection;
 
         public ChampPaquetAttribute(string Nom, int Position, Type type, object EndValue = null, int MaxLength = -1)
         {
@@ -24,8 +25,13 @@ namespace TFTP_Client_Serveur.Paquet
             m_Position = Position;
             m_Type = type;
             m_endValueType = this.getElementType();
+            m_isCollection = this.Type.GetInterface("ICollection") != null;
             if (!m_endValueType.IsPrimitive)
                 throw new InvalidCastException("Le type de " + m_Nom + " n'est pas primitif");
+            if (m_endValueType == typeof(string))
+                throw new InvalidCastException("Utilisez le type byte[] ou char[] pour les tableaux de caractères");
+            if (m_endValueType == typeof(DateTime))
+                throw new InvalidCastException("Le type DateTime n'est pas supporté");
             if (EndValue != null)
             {
                 if (EndValue.GetType() == m_endValueType)
@@ -37,6 +43,7 @@ namespace TFTP_Client_Serveur.Paquet
             {
                 m_MaxLength = MaxLength;
             }
+            
 
         }
 
@@ -79,12 +86,17 @@ namespace TFTP_Client_Serveur.Paquet
             return this.Nom + " at " + m_Position.ToString() + " of type " + m_Type.ToString();
         }
 
+        public bool isCollection
+        {
+            get { return m_isCollection; }
+        }
+
         public int Size
         {
             get
             {
                 Type t = m_endValueType;
-                if (this.Type.GetInterface("ICollection") != null)
+                if (m_isCollection)
                 {
                     if (this.MaxLength != -1)
                         return Marshal.SizeOf(t) * MaxLength;
@@ -94,5 +106,9 @@ namespace TFTP_Client_Serveur.Paquet
             }
         }
 
+        public Type SubType
+        {
+            get { return m_endValueType; }
+        }
     }
 }

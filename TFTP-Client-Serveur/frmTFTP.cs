@@ -121,7 +121,7 @@ namespace TFTP_Client_Serveur
         private void btnEnvoyerClient_Click(object sender, EventArgs e)
         {
             absPaquet paq;
-            absPaquet.Decoder(new byte[] { 0, 3, 0, 2, 1, 1, 1, 1}, out paq);
+            absPaquet.Decoder(new byte[] { 0, 1, 70, 105, 99, 104, 105, 101, 114, 46, 116, 120, 116, 0, 111, 99, 116, 101, 116, 0}, out paq);
 
         }
 

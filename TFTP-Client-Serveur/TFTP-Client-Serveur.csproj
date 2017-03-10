@@ -59,6 +59,7 @@
     <Compile Include="Paquet\DataPaquet.cs" />
     <Compile Include="Paquet\ErrorPaquet.cs" />
     <Compile Include="Paquet\InitPaquet.cs" />
+    <Compile Include="Paquet\PaquetInfo.cs" />
     <Compile Include="Paquet\RRQPaquet.cs" />
     <Compile Include="Paquet\TypePaquetAttribute.cs" />
     <Compile Include="Paquet\WRQPaquet.cs" />

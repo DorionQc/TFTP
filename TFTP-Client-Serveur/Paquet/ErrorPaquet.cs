@@ -26,7 +26,7 @@ namespace TFTP_Client_Serveur.Paquet
     };
 
     [ChampPaquet("ErrorCode", 1, typeof(short))]
-    [ChampPaquet("ErrorMessage", 2, typeof(char[]), EndValue: '\0')]
+    [ChampPaquet("ErrorMessage", 2, typeof(byte[]), EndValue: (byte)0)]
     [TypePaquet(TypePaquet.ERROR)]
     public class ErrorPaquet : absPaquet
     {

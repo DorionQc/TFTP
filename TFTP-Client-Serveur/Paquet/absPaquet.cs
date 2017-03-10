@@ -32,7 +32,7 @@ namespace TFTP_Client_Serveur.Paquet
         /// <summary>
         /// Liste des types dérivés de cette classe
         /// </summary>
-        private static List<Type> s_lClassesEnfant;
+        private static List<PaquetInfo> s_lClassesEnfant;
 
         /// <summary>
         /// Décode un paquet et retourne une trame du type approprié
@@ -46,8 +46,8 @@ namespace TFTP_Client_Serveur.Paquet
             Paquet = null;
             object paquetInst;
             TypePaquet type;
-            Type t = null;
-            IEnumerator<Type> Enumerator;
+            PaquetInfo pi;
+            IEnumerator<PaquetInfo> Enumerator;
 
             // Vérification de longueur minimale
             if (Data.Length < 2)
@@ -58,12 +58,13 @@ namespace TFTP_Client_Serveur.Paquet
 
             // Trouver la bonne classe pour ce type de paquet (par l'attribut de classe TypePaquetAttribute)
             Enumerator = s_lClassesEnfant.GetEnumerator();
+            pi = Enumerator.Current; // Juste pour que le compilateur ne chiale pas que la variable soit potentiellement pas assignée
             while (Enumerator.MoveNext() && Paquet == null)
             {
-                t = Enumerator.Current;
-                if (getTypePaquet(t) == type)
+                pi = Enumerator.Current;
+                if (pi.TypePaquet == type)
                 {
-                    paquetInst = Activator.CreateInstance(t);
+                    paquetInst = Activator.CreateInstance(pi.TypeClasse);
                     if (paquetInst is absPaquet)
                     {
                         Paquet = (absPaquet)paquetInst;
@@ -72,7 +73,7 @@ namespace TFTP_Client_Serveur.Paquet
             }
 
             // Si on a pas trouvé de type approprié
-            if (Paquet == null || t == null)
+            if (Paquet == null)
                 return false;
 
             // Quelques autres variables
@@ -87,7 +88,7 @@ namespace TFTP_Client_Serveur.Paquet
 
 
             // Recherche des champs de la trame
-            Attribs = getPaquetAttributes(t).OrderBy(a => a.Position).ToArray();
+            Attribs = pi.tAttribut.OrderBy(a => a.Position).ToArray();
             Valeurs = new object[Attribs.Length];
 
             while (Pos < Max && i < Attribs.Length)
@@ -104,8 +105,23 @@ namespace TFTP_Client_Serveur.Paquet
                         Taille = Data.Length - Pos;
                 }
                 Logger.INSTANCE.Log(ConsoleSource.Interface, att.ToString() + " ||| Taille = " + Taille.ToString());
+
+                Valeurs[i] = getValue(att, Data, ref Pos);
+
+                Logger.INSTANCE.Log(ConsoleSource.Interface, att.ToString() + " value = " + Valeurs[i].ToString());
+                if (Valeurs[i] is Array)
+                {
+                    Array a = (Array)Valeurs[i];
+                    for (int j = 0; j < a.Length; j++)
+                    {
+                        Logger.INSTANCE.Log(ConsoleSource.Interface, att.ToString() + " value at index " + j.ToString() + " = " + a.GetValue(j).ToString());
+                    }
+                    if (att.SubType == typeof(byte))
+                    {
+                        Logger.INSTANCE.Log(ConsoleSource.Interface, att.ToString() + " string value = " + Encoding.ASCII.GetString((byte[])a));
+                    }
+                }
                 i++;
-                Pos++;
             }
 
             return false;
@@ -122,12 +138,98 @@ namespace TFTP_Client_Serveur.Paquet
         static absPaquet()
         {
             // Recherche toutes les classes qui héritent de absPaquet
-            s_lClassesEnfant = new List<Type>();
-            foreach (Type t in Assembly.GetAssembly(typeof(absPaquet)).GetTypes()
-                .Where(type => type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(absPaquet))))
+            s_lClassesEnfant = new List<PaquetInfo>();
+            IEnumerable<Type> types = Assembly.GetAssembly(typeof(absPaquet)).GetTypes();
+            types = types.Where(type => type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(absPaquet))).ToArray();
+            IEnumerator<Type> Enumerator = types.GetEnumerator();
+            Type t;
+            while (Enumerator.MoveNext())
             {
-                s_lClassesEnfant.Add(t);
+                t = Enumerator.Current;
+                s_lClassesEnfant.Add(new PaquetInfo(t, getPaquetAttributes(t), getTypePaquet(t)));
             }
+        }
+
+
+        private static object getValue(ChampPaquetAttribute att, byte[] Data, ref int Position)
+        {
+            if (att.isCollection)
+            {
+                Type t = att.SubType;
+                int size = Marshal.SizeOf(t);
+                int init = Position;
+                int i = 0;
+                Array a;
+                if (att.EndValue != null)
+                {
+                    bool Fin = false;
+                    object val;
+                    a = Array.CreateInstance(t, 16);
+                    
+                    while (Position + size <= Data.Length && i < a.Length && !Fin)
+                    {
+                        val = getValue(t, Data, ref Position);
+                        if ((byte)val == (byte)att.EndValue)
+                            Fin = true;
+                        else
+                        {
+                            if (i == a.Length - 1)
+                            {
+                                if (a.Length == 512)
+                                    Fin = true;
+                                else
+                                {
+                                    Array tmp = Array.CreateInstance(t, a.Length << 1);
+                                    Buffer.BlockCopy(a, 0, tmp, 0, a.Length);
+                                    a = tmp;
+                                }
+                            }
+                            a.SetValue(val, i);
+                            i++;
+                        }
+                    }
+                }
+                else
+                {
+                    a = Array.CreateInstance(t, att.MaxLength);
+
+                    while (Position + size <= Data.Length && i < att.MaxLength)
+                    {
+                        a.SetValue(getValue(t, Data, ref Position), i);
+                        i++;
+                    }
+                }
+                Array b = Array.CreateInstance(t, i);
+                Buffer.BlockCopy(a, 0, b, 0, i);
+                return b;
+            }
+            else
+            {
+                return getValue(att.Type, Data, ref Position);
+            }
+        }
+
+        private static object getValue(Type t, byte[] Data, ref int Position)
+        {
+            int size = Marshal.SizeOf(t);
+            if (Data.Length < Position + size)
+                return null;
+
+            Array a = Array.CreateInstance(t, 1);
+            byte[] bytes = new byte[size];
+            Buffer.BlockCopy(Data, Position, bytes, 0, size);
+            byte b;
+            // Swap, because BlockCopy would change the Endian :I
+            for (int i = 0; i < size / 2; i++)
+            {
+                b = bytes[bytes.Length - 1 - i];
+                bytes[bytes.Length - 1 - i] = bytes[i];
+                bytes[i] = b;
+            }
+            Buffer.BlockCopy(bytes, 0, a, 0, size);
+
+            Position += size;
+            return a.GetValue(0);
         }
 
         /// <summary>

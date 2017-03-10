@@ -26,6 +26,7 @@ namespace TFTP_Client_Serveur
 
         // Singleton!
 
+        
         private static Logger __instance;
         public static Logger INSTANCE
         {
