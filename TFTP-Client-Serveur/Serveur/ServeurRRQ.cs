@@ -101,6 +101,9 @@ namespace TFTP_Client_Serveur.Serveur
                         }
                     }
                 }
+
+                if (NbEssais == 10)
+                    this.Continuer = false;
             }
 
             Terminer();
