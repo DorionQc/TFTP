@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 
 //using TFTP_Client_Serveur.Client;
 using TFTP_Client_Serveur.Serveur;
@@ -119,7 +120,9 @@ namespace TFTP_Client_Serveur
 
         private void btnEnvoyerClient_Click(object sender, EventArgs e)
         {
-
+            Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            s.Bind(new IPEndPoint(0, 0));
+            s.SendTo(new byte[] { 0, 1, 65, 0, 111, 99, 116, 101, 116}, new IPEndPoint(IPAddress.Parse("192.168.0.104"), 69));
         }
 
         private void btnRecevoirClient_Click(object sender, EventArgs e)

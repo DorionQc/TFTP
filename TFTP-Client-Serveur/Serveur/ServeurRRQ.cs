@@ -52,6 +52,7 @@ namespace TFTP_Client_Serveur.Serveur
             if (!File.Exists(m_NomFichier))
             {
                 Envoyer(new ErrorPaquet(CodeErreur.FileNotFound, "Impossible de trouver le fichier"));
+                logger.Log(ConsoleSource.Serveur, "Impossible de trouver le fichier");
                 return;
             }
             try {
@@ -61,6 +62,7 @@ namespace TFTP_Client_Serveur.Serveur
             catch (Exception ex)
             {
                 Envoyer(new ErrorPaquet(CodeErreur.AccessViolation, "Erreur lors de la lecture du fichier : " + ex.Message));
+                logger.Log(ConsoleSource.Serveur, "Erreur lors de la lecture du fichier");
                 return;
             }
             BinaryReader br = new BinaryReader(m_fs);
@@ -74,7 +76,7 @@ namespace TFTP_Client_Serveur.Serveur
                 AckRecu = false;
                 NbEssais++;
 
-                while (!AckRecu && DateTime.Now.Millisecond - temps.Millisecond < 5000)
+                while (!AckRecu && DateTime.Now.Ticks - temps.Ticks < 5000000)
                 {
                     if (this.Socket.Available == 0)
                         Thread.Sleep(0);
@@ -85,7 +87,7 @@ namespace TFTP_Client_Serveur.Serveur
                         {
                             if (recu.Type == TypePaquet.ACK && ((AckPaquet)recu).NoBlock == (short)NumeroPaquet)
                             {
-                                logger.Log(ConsoleSource.Serveur, "Réception du ACK du paquet #" + ((AckPaquet)recu).NoBlock.ToString());
+                                //logger.Log(ConsoleSource.Serveur, "Réception du ACK du paquet #" + ((AckPaquet)recu).NoBlock.ToString());
                                 AckRecu = true;
                                 NbEssais = 0;
                                 NumeroPaquet++;
@@ -105,7 +107,7 @@ namespace TFTP_Client_Serveur.Serveur
                 if (NbEssais == 10)
                     this.Continuer = false;
             }
-
+            this.Event.Set();
             Terminer();
         }
     }

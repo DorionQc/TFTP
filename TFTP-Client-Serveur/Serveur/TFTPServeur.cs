@@ -207,5 +207,11 @@ namespace TFTP_Client_Serveur.Serveur
             m_Running.WaitOne();
             logger.Log(ConsoleSource.Serveur, "Serveur arrêté");
         }
+
+        public void EnleverConnection(Connection c)
+        {
+            m_lConnection.Remove(c);
+
+        }
     }
 }

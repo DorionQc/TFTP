@@ -31,8 +31,6 @@
             this.gpServeur = new System.Windows.Forms.GroupBox();
             this.btnRafraichirServeur = new System.Windows.Forms.Button();
             this.cbIPServeur = new System.Windows.Forms.ComboBox();
-            this.txtConnexionsServeur = new System.Windows.Forms.TextBox();
-            this.lblConnexionsServeur = new System.Windows.Forms.Label();
             this.btnArreterServeur = new System.Windows.Forms.Button();
             this.btnDemarrerServeur = new System.Windows.Forms.Button();
             this.btnDossierServeur = new System.Windows.Forms.Button();
@@ -73,8 +71,6 @@
             this.gpServeur.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.gpServeur.Controls.Add(this.btnRafraichirServeur);
             this.gpServeur.Controls.Add(this.cbIPServeur);
-            this.gpServeur.Controls.Add(this.txtConnexionsServeur);
-            this.gpServeur.Controls.Add(this.lblConnexionsServeur);
             this.gpServeur.Controls.Add(this.btnArreterServeur);
             this.gpServeur.Controls.Add(this.btnDemarrerServeur);
             this.gpServeur.Controls.Add(this.btnDossierServeur);
@@ -108,23 +104,6 @@
             this.cbIPServeur.Size = new System.Drawing.Size(121, 21);
             this.cbIPServeur.TabIndex = 10;
             this.cbIPServeur.SelectedIndexChanged += new System.EventHandler(this.cbIPServeur_SelectedIndexChanged);
-            // 
-            // txtConnexionsServeur
-            // 
-            this.txtConnexionsServeur.Location = new System.Drawing.Point(164, 116);
-            this.txtConnexionsServeur.Name = "txtConnexionsServeur";
-            this.txtConnexionsServeur.ReadOnly = true;
-            this.txtConnexionsServeur.Size = new System.Drawing.Size(100, 20);
-            this.txtConnexionsServeur.TabIndex = 9;
-            // 
-            // lblConnexionsServeur
-            // 
-            this.lblConnexionsServeur.AutoSize = true;
-            this.lblConnexionsServeur.Location = new System.Drawing.Point(32, 119);
-            this.lblConnexionsServeur.Name = "lblConnexionsServeur";
-            this.lblConnexionsServeur.Size = new System.Drawing.Size(128, 13);
-            this.lblConnexionsServeur.TabIndex = 8;
-            this.lblConnexionsServeur.Text = "Nombre de connexions = ";
             // 
             // btnArreterServeur
             // 
@@ -399,8 +378,6 @@
         #endregion
 
         private System.Windows.Forms.GroupBox gpServeur;
-        private System.Windows.Forms.TextBox txtConnexionsServeur;
-        private System.Windows.Forms.Label lblConnexionsServeur;
         private System.Windows.Forms.Button btnArreterServeur;
         private System.Windows.Forms.Button btnDemarrerServeur;
         private System.Windows.Forms.Button btnDossierServeur;
