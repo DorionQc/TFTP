@@ -103,6 +103,8 @@ namespace TFTP_Client_Serveur.Serveur
             this.Event.WaitOne();
             if (m_br != null) m_br.Close();
             if (m_fs != null) m_fs.Close();
+
+            TFTPServeur.INSTANCE.EnleverConnection(this);
             logger.Log(ConsoleSource.Serveur, "La connection vers " + m_DistantEP.ToString() + " est terminée");
         }
 
@@ -132,7 +134,7 @@ namespace TFTP_Client_Serveur.Serveur
             byte[] Data;
             paquet.Encode(out Data);
             this.Socket.SendTo(Data, m_DistantEP);
-            logger.Log(ConsoleSource.Serveur, "Envoi du packet " + paquet.ToString());
+            //logger.Log(ConsoleSource.Serveur, "Envoi du packet " + paquet.ToString());
         }
 
     }
