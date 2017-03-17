@@ -38,11 +38,11 @@ namespace TFTP_Client_Serveur
         {
             InitializeComponent();
             // Pour savoir quand le textbox est prêt pour la console
-            this.txtConsole.HandleCreated += TxtConsole_HandleCreated;
+            txtConsole.HandleCreated += TxtConsole_HandleCreated;
 
             // Création de la console
             logger = Logger.INSTANCE;
-            logger.TextBox = this.txtConsole;
+            logger.TextBox = txtConsole;
 
             // Dossier par défaut
             m_DossierParDefaut = Path.Combine(Directory.GetCurrentDirectory(), "TFTP");
@@ -63,7 +63,7 @@ namespace TFTP_Client_Serveur
             txtDossierServeur.Text = m_DossierLocalServeur.FullName;
         }
 
-        private void TxtConsole_HandleCreated(object sender, System.EventArgs e)
+        private void TxtConsole_HandleCreated(object sender, EventArgs e)
         {
             // Indique que le textbox est prêt à recevoir la console
             // Vidage du group box d'IPs
@@ -72,7 +72,7 @@ namespace TFTP_Client_Serveur
             foreach (IPAddress ip in NetworkUtils.getLocalIPs())
             {
                 cbIPServeur.Items.Add(ip.ToString());
-                logger.Log(ConsoleSource.Interface, "IP Trouvée - " + ip.ToString());
+                logger.Log(ConsoleSource.Interface, "IP Trouvée - " + ip);
             }
             // Sélection de la première IP
             if (cbIPServeur.Items.Count != 0)
@@ -184,7 +184,7 @@ namespace TFTP_Client_Serveur
             if (!IPAddress.TryParse(cbIPServeur.Items[Indice].ToString(), out m_AdresseLocale))
             {
                 // IP Invalide
-                logger.Log(ConsoleSource.Interface, "Impossible de lire l'IP - " + cbIPServeur.Items[Indice].ToString());
+                logger.Log(ConsoleSource.Interface, "Impossible de lire l'IP - " + cbIPServeur.Items[Indice]);
                 cbIPServeur.Items.RemoveAt(Indice);
                 cbIPServeur.SelectedIndex = cbIPServeur.Items.Count - 1;
                 cbIPServeur_SelectedIndexChanged(null, null);
@@ -192,10 +192,10 @@ namespace TFTP_Client_Serveur
                 return;
             }
 
-            if (m_AdresseLocale != IPAddress.None)
+            if (!m_AdresseLocale.Equals(IPAddress.None))
             {
                 // IP lisible et non-nulle
-                logger.Log(ConsoleSource.Serveur, "Utilisation de l'adresse IP " + m_AdresseLocale.ToString());
+                logger.Log(ConsoleSource.Serveur, "Utilisation de l'adresse IP " + m_AdresseLocale);
             }
 
 

@@ -18,9 +18,9 @@ namespace TFTP_Client_Serveur.Paquet
         private string m_Fichier;
         private string m_Mode;
 
-        public InitPaquet() { }
+        protected InitPaquet() { }
 
-        public InitPaquet(string Fichier, TypePaquet type) : base(type)
+        protected InitPaquet(string Fichier, TypePaquet type) : base(type)
         {
             m_Fichier = Fichier;
             m_Mode = "octet";
@@ -66,7 +66,7 @@ namespace TFTP_Client_Serveur.Paquet
             m_Fichier = Fichier;
             m_Mode = sb.ToString();
 
-            this.Type = (TypePaquet)Data[1];
+            Type = (TypePaquet)Data[1];
 
             return true;
         }
@@ -79,7 +79,7 @@ namespace TFTP_Client_Serveur.Paquet
             Data = new byte[4 + FileBytes.Length + ModeBytes.Length];
 
             Data[0] = 0;
-            Data[1] = (byte)this.Type;
+            Data[1] = (byte)Type;
             Array.Copy(FileBytes, 0, Data, 2, FileBytes.Length);
             Data[FileBytes.Length + 2] = 0;
             Array.Copy(ModeBytes, 0, Data, FileBytes.Length + 3, ModeBytes.Length);

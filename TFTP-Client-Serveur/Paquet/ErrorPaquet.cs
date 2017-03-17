@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 
 namespace TFTP_Client_Serveur.Paquet
 {
-    public enum CodeErreur : short
+    public enum CodeErreur : ushort
     {
         Undefined = 0,
         FileNotFound = 1,
@@ -56,12 +56,12 @@ namespace TFTP_Client_Serveur.Paquet
         {
             StringBuilder sb;
             int i;
-            short CodeErreur;
+            ushort CodeErreur;
             if (Data.Length < 4)
                 return false;
             if (Data[0] != 0 || Data[1] != (byte)TypePaquet.ERROR)
                 return false;
-            CodeErreur = BitConverter.ToInt16(Data, 2);
+            CodeErreur = BitConverter.ToUInt16(Data, 2);
             if (CodeErreur < 0 || CodeErreur > 7)
                 return false;
             i = 4;
@@ -75,7 +75,7 @@ namespace TFTP_Client_Serveur.Paquet
                 return false;
             m_CodeErreur = (CodeErreur)CodeErreur;
             m_MessageErreur = sb.ToString();
-            this.Type = TypePaquet.ERROR;
+            Type = TypePaquet.ERROR;
             return true;
         }
 
@@ -85,9 +85,9 @@ namespace TFTP_Client_Serveur.Paquet
             Data = new byte[5 + bytesErreur.Length];
 
             Data[0] = 0;
-            Data[1] = (byte)this.Type;
-            Data[2] = (byte)(((short)m_CodeErreur & 0xff00) >> 8);
-            Data[3] = (byte)((short)m_CodeErreur & 0xff);
+            Data[1] = (byte)Type;
+            Data[2] = (byte)(((ushort)m_CodeErreur & 0xff00) >> 8);
+            Data[3] = (byte)((ushort)m_CodeErreur & 0xff);
             Array.Copy(bytesErreur, 0, Data, 4, bytesErreur.Length);
             Data[Data.Length - 1] = 0;
             return true;

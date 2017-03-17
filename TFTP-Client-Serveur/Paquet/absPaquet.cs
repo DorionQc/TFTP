@@ -26,15 +26,15 @@ namespace TFTP_Client_Serveur.Paquet
     public abstract class absPaquet
     {
         public TypePaquet Type;
-        
-        public absPaquet() { }
 
-        public absPaquet(TypePaquet Type)
+        protected absPaquet() { }
+
+        protected absPaquet(TypePaquet Type)
         {
             this.Type = Type;
         }
 
-        public static bool Decoder(byte[] Data, out absPaquet Paquet)
+        public static bool  Decoder(byte[] Data, out absPaquet Paquet)
         {
             Paquet = null;
             object paquetInst;
@@ -49,7 +49,7 @@ namespace TFTP_Client_Serveur.Paquet
             type = (TypePaquet)Data[1];
 
             IEnumerator<Type> Enumerator = s_lClassesEnfant.GetEnumerator();
-            while (Enumerator.MoveNext() && Paquet == null)
+            while (Enumerator.MoveNext())// && Paquet == null) c'est toujours vrai de toutes façons
             {
                 t = Enumerator.Current;
                 if (getTypePaquet(t) == type)
