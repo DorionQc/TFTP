@@ -19,16 +19,16 @@ namespace TFTP_Client_Serveur.Paquet
         /*// Ce champ doit OBLIGATOIREMENT exister pour que le paquet soit reconnu.
         public static TypePaquet TYPEPAQUET = TypePaquet.ACK;*/
 
-        private short m_NoBlock;
+        private ushort m_NoBlock;
 
         public AckPaquet() { }
 
-        public AckPaquet(short NoBlock) : base(TypePaquet.ACK)
+        public AckPaquet(ushort NoBlock) : base(TypePaquet.ACK)
         {
             m_NoBlock = NoBlock;
         }
 
-        public short NoBlock
+        public ushort NoBlock
         {
             get { return m_NoBlock; }
         }
@@ -40,9 +40,9 @@ namespace TFTP_Client_Serveur.Paquet
                 return false;
             if (Data[0] != 0 || Data[1] != (byte)TypePaquet.ACK)
                 return false;
-            this.Type = TypePaquet.ACK;
+            Type = TypePaquet.ACK;
 
-            m_NoBlock = (short)((Data[2] << 8) + Data[3]);
+            m_NoBlock = (ushort)((Data[2] << 8) + Data[3]);
             return true;
         }
 
@@ -50,7 +50,7 @@ namespace TFTP_Client_Serveur.Paquet
         {
             Data = new byte[4];
             Data[0] = 0;
-            Data[1] = (byte)this.Type;
+            Data[1] = (byte)Type;
             Data[2] = (byte)((m_NoBlock & 0xff00) >> 8);
             Data[3] = (byte)(m_NoBlock & 0xff);
             return true;

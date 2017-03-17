@@ -28,6 +28,7 @@ namespace TFTP_Client_Serveur.Serveur
         protected EndPoint m_LocalEP;
         protected FileStream m_fs;
         protected BinaryReader m_br;
+        protected BinaryWriter m_bw;
 
         protected Logger logger;
 
@@ -72,7 +73,7 @@ namespace TFTP_Client_Serveur.Serveur
             }
         }
 
-        public Connection()
+        protected Connection()
         {
             logger = Logger.INSTANCE;
             m_Event = new ManualResetEvent(false);
@@ -83,29 +84,29 @@ namespace TFTP_Client_Serveur.Serveur
 
         public bool Demarrer()
         {
-            if (this.Socket != null)
+            if (Socket != null)
                 return false;
-            this.Event.Set();
-            this.Socket = new Socket(AddressFamily.InterNetwork,
+            Event.Set();
+            Socket = new Socket(AddressFamily.InterNetwork,
                 SocketType.Dgram, ProtocolType.Udp);
-            this.Socket.Bind(m_LocalEP);
-            this.Thread = new Thread(new ThreadStart(Communication));
-            this.Continuer = true;
-            this.Thread.Start();
+            Socket.Bind(m_LocalEP);
+            Thread = new Thread(Communication);
+            Continuer = true;
+            Thread.Start();
             return true;
         }
 
         public void Terminer()
         {
-            if (!this.Continuer)
+            if (!Continuer)
                 return;
-            this.Continuer = false;
-            this.Event.WaitOne();
-            if (m_br != null) m_br.Close();
-            if (m_fs != null) m_fs.Close();
+            Continuer = false;
+            Event.WaitOne();
+            m_br?.Close();
+            m_fs?.Close();
 
             TFTPServeur.INSTANCE.EnleverConnection(this);
-            logger.Log(ConsoleSource.Serveur, "La connection vers " + m_DistantEP.ToString() + " est terminée");
+            logger.Log(ConsoleSource.Serveur, "La connection vers " + m_DistantEP + " est terminée");
         }
 
         protected byte[] SeparerFichier(long NoPaquet)
@@ -113,27 +114,21 @@ namespace TFTP_Client_Serveur.Serveur
             NoPaquet--;
             if (m_fs.Length < NoPaquet * 512)
                 return null;
-            else if (m_fs.Length == NoPaquet * 512)
+            if (m_fs.Length == NoPaquet * 512)
                 return new byte[0];
-            else
+            m_fs.Seek(NoPaquet * 512, SeekOrigin.Begin);
+            if (m_fs.Length >= (NoPaquet + 1) * 512)
             {
-                m_fs.Seek(NoPaquet * 512, SeekOrigin.Begin);
-                if (m_fs.Length >= (NoPaquet + 1) * 512)
-                {
-                    return m_br.ReadBytes(512);
-                }
-                else
-                {
-                    return m_br.ReadBytes((int)(m_fs.Length - (NoPaquet * 512)));
-                }
+                return m_br.ReadBytes(512);
             }
+            return m_br.ReadBytes((int)(m_fs.Length - (NoPaquet * 512)));
         }
 
         protected void Envoyer(absPaquet paquet)
         {
             byte[] Data;
             paquet.Encode(out Data);
-            this.Socket.SendTo(Data, m_DistantEP);
+            Socket.SendTo(Data, m_DistantEP);
             //logger.Log(ConsoleSource.Serveur, "Envoi du packet " + paquet.ToString());
         }
 

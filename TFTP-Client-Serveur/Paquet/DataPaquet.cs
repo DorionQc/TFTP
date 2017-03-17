@@ -19,13 +19,13 @@ namespace TFTP_Client_Serveur.Paquet
         /*// Ce champ doit OBLIGATOIREMENT exister pour que le paquet soit reconnu.
         public static TypePaquet TYPEPAQUET = TypePaquet.DATA;*/
 
-        private short m_NoBlock;
+        private ushort m_NoBlock;
         private byte[] m_Data;
         private bool m_Dernier;
 
         public DataPaquet() { }
 
-        public DataPaquet(short NoBlock, byte[] Data) : base(TypePaquet.DATA)
+        public DataPaquet(ushort NoBlock, byte[] Data) : base(TypePaquet.DATA)
         {
             m_NoBlock = NoBlock;
             if (Data.Length > 512)
@@ -42,7 +42,7 @@ namespace TFTP_Client_Serveur.Paquet
             get { return m_Data.Length < 512; }
         }
 
-        public short NoBlock
+        public ushort NoBlock
         {
             get { return m_NoBlock; }
         }
@@ -58,10 +58,12 @@ namespace TFTP_Client_Serveur.Paquet
                 return false;
             if (Data[0] != 0 || Data[1] != (byte)TypePaquet.DATA)
                 return false;
-            m_NoBlock = BitConverter.ToInt16(Data, 2);
+            m_NoBlock = (ushort)((Data[2] << 8) | Data[3]);
+
+
             if (Data.Length > 516)
             {
-                Logger.INSTANCE.Log(ConsoleSource.Serveur, "[ERREUR] Le paquet #" + m_NoBlock.ToString() + " contient plus de 512 octets!!!");
+                Logger.INSTANCE.Log(ConsoleSource.Serveur, "[ERREUR] Le paquet #" + m_NoBlock + " contient plus de 512 octets!!!");
                 m_Data = new byte[512];
                 Array.Copy(Data, 4, m_Data, 0, 512);
             }
@@ -74,7 +76,7 @@ namespace TFTP_Client_Serveur.Paquet
             {
                 m_Data = new byte[0];
             }
-            this.Type = TypePaquet.DATA;
+            Type = TypePaquet.DATA;
             return true;
 
 
@@ -84,7 +86,7 @@ namespace TFTP_Client_Serveur.Paquet
         {
             Data = new byte[4 + m_Data.Length];
             Data[0] = 0;
-            Data[1] = (byte)this.Type;
+            Data[1] = (byte)Type;
             Data[2] = (byte)((m_NoBlock & 0xff00) >> 8);
             Data[3] = (byte)(m_NoBlock & 0xff);
             Array.Copy(m_Data, 0, Data, 4, m_Data.Length);

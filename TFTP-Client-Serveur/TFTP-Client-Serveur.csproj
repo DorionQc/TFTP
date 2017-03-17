@@ -66,6 +66,7 @@
     <Compile Include="Serveur\Connection.cs" />
     <Compile Include="Paquet\absPaquet.cs" />
     <Compile Include="Serveur\ServeurRRQ.cs" />
+    <Compile Include="Serveur\ServeurWRQ.cs" />
     <Compile Include="Serveur\TFTPServeur.cs" />
     <EmbeddedResource Include="frmTFTP.resx">
       <DependentUpon>frmTFTP.cs</DependentUpon>

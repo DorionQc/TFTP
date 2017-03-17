@@ -12,9 +12,11 @@ using System.Threading.Tasks;
 
 namespace TFTP_Client_Serveur.Paquet
 {
+
     [TypePaquet(TypePaquet.WRQ)]
     public class WRQPaquet : InitPaquet
     {
+
         /*// Ce champ doit OBLIGATOIREMENT exister pour que le paquet soit reconnu.
         public static TypePaquet TYPEPAQUET = TypePaquet.WRQ;*/
 
@@ -22,5 +24,6 @@ namespace TFTP_Client_Serveur.Paquet
         { }
 
         public WRQPaquet() { }
+
     }
 }

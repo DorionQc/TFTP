@@ -36,14 +36,7 @@ namespace TFTP_Client_Serveur.Serveur
         private static TFTPServeur __instance;
         public static TFTPServeur INSTANCE
         {
-            get
-            {
-                if (__instance == null)
-                {
-                    __instance = new TFTPServeur();
-                }
-                return __instance;
-            }
+            get { return __instance ?? (__instance = new TFTPServeur()); }
         }
 
         public bool Initialised
@@ -54,7 +47,7 @@ namespace TFTP_Client_Serveur.Serveur
         // Port à utiliser (TFTP utilise 69 par défaut)
         private const int PORT = 69;
         // Longueur du timeout, avant d'abandonner une connection, en ms
-        private const int TIMEOUT = 2000;
+        private const int TIMEOUT = 2000; //Le timeout ne marche pas
         // Nombre de connections limite
         private const int LIMITECONNECTION = 30;
 
@@ -124,7 +117,7 @@ namespace TFTP_Client_Serveur.Serveur
 
             m_Continue = true;
             // Crée et commence le thread
-            m_ThreadEcoute = new Thread(new ThreadStart(Ecoute));
+            m_ThreadEcoute = new Thread(Ecoute);
             m_ThreadEcoute.Start();
 
             m_Initialized = true;
@@ -153,7 +146,7 @@ namespace TFTP_Client_Serveur.Serveur
                     Thread.Sleep(0);
                 else
                 {
-                    len = m_ListenerSocket.ReceiveFrom(buffer, 0, 64, SocketFlags.None, ref DistantEP);
+                    len = m_ListenerSocket.ReceiveFrom(buffer, 0, 512, SocketFlags.None, ref DistantEP);
 
                     if (len != 0)
                     {
@@ -173,7 +166,9 @@ namespace TFTP_Client_Serveur.Serveur
                                 }
                                 else if (paquet.Type == TypePaquet.WRQ)
                                 {
-                                    // TODO this
+                                    m_lConnection.Add(new ServeurWRQ(Path.Combine(m_Dossier.FullName, ((WRQPaquet)paquet).Fichier),
+                                        DistantEP,
+                                        new IPEndPoint(((IPEndPoint)m_LocalEP).Address, 0)));
                                 }
                                 else
                                 {

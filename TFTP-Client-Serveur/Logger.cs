@@ -29,12 +29,7 @@ namespace TFTP_Client_Serveur
         private static Logger __instance;
         public static Logger INSTANCE
         {
-            get
-            {
-                if (__instance == null)
-                    __instance = new Logger();
-                return __instance;
-            }
+            get { return __instance ?? (__instance = new Logger()); }
         }
 
         // Propriété pour le textbox à utiliser
