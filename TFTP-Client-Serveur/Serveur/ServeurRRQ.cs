@@ -53,6 +53,8 @@ namespace TFTP_Client_Serveur.Serveur
             {
                 Envoyer(new ErrorPaquet(CodeErreur.FileNotFound, "Impossible de trouver le fichier"));
                 logger.Log(ConsoleSource.Serveur, "Impossible de trouver le fichier");
+                Event.Set();
+                Terminer();
                 return;
             }
             try {
@@ -63,6 +65,8 @@ namespace TFTP_Client_Serveur.Serveur
             {
                 Envoyer(new ErrorPaquet(CodeErreur.AccessViolation, "Erreur lors de la lecture du fichier : " + ex.Message));
                 logger.Log(ConsoleSource.Serveur, "Erreur lors de la lecture du fichier");
+                Event.Set();
+                Terminer();
                 return;
             }
         //    BinaryReader br = new BinaryReader(m_fs);
@@ -76,7 +80,7 @@ namespace TFTP_Client_Serveur.Serveur
                 AckRecu = false;
                 NbEssais++;
 
-                while (!AckRecu && DateTime.Now.Ticks - temps.Ticks < 5000000)
+                while (!AckRecu && DateTime.Now.Ticks - temps.Ticks < 50000000)
                 {
                     if (Socket.Available == 0)
                         Thread.Sleep(0);

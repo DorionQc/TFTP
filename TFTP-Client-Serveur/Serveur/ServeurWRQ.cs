@@ -49,23 +49,33 @@ namespace TFTP_Client_Serveur.Serveur
             logger.Log(ConsoleSource.Serveur, "Nouvelle connection WRQ vers " + m_DistantEP);
 
 
-           /* if (!File.Exists(m_NomFichier))
+            if (!File.Exists(m_NomFichier))
             {
-                File.Create(m_NomFichier);
-                logger.Log(ConsoleSource.Serveur, "Impossible de trouver le fichier\nCréation d'un nouveau fichier");
-            }  ??*/
-            try
-            {
-                m_fs = new FileStream(m_NomFichier, FileMode.Create, FileAccess.Write);
-                m_bw = new BinaryWriter(m_fs);
-                m_bw.Seek(0, SeekOrigin.Begin);
+
+                try
+                {
+                    m_fs = File.Create(m_NomFichier);
+                    m_bw = new BinaryWriter(m_fs);
+                    m_bw.Seek(0, SeekOrigin.Begin);
+                }
+                catch (Exception ex)
+                {
+                    Envoyer(new ErrorPaquet(CodeErreur.AccessViolation, "Erreur lors de l'écriture du fichier : " + ex.Message));
+                    logger.Log(ConsoleSource.Serveur, "Erreur lors de l'écriture du fichier : " + ex.Message);
+                    Event.Set();
+                    Terminer();
+                    return;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Envoyer(new ErrorPaquet(CodeErreur.AccessViolation, "Erreur lors de l'écriture du fichier : " + ex.Message));
-                logger.Log(ConsoleSource.Serveur, "Erreur lors de l'écriture du fichier : " + ex.Message);
+                Envoyer(new ErrorPaquet(CodeErreur.FileExists, "Le fichier existe déjà"));
+                logger.Log(ConsoleSource.Serveur, "Le fichier existe déjà");
+                Event.Set();
+                Terminer();
                 return;
             }
+            
             // Envoi du  ack
             ack = new AckPaquet((ushort)NumeroPaquet);
             Envoyer(ack);
