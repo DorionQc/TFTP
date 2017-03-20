@@ -49,14 +49,14 @@ namespace TFTP_Client_Serveur.Serveur
             logger.Log(ConsoleSource.Serveur, "Nouvelle connection WRQ vers " + m_DistantEP);
 
 
-            if (!File.Exists(m_NomFichier))
+           /* if (!File.Exists(m_NomFichier))
             {
                 File.Create(m_NomFichier);
                 logger.Log(ConsoleSource.Serveur, "Impossible de trouver le fichier\nCréation d'un nouveau fichier");
-            }
+            }  ??*/
             try
             {
-                m_fs = new FileStream(m_NomFichier, FileMode.Open, FileAccess.Write);
+                m_fs = new FileStream(m_NomFichier, FileMode.Create, FileAccess.Write);
                 m_bw = new BinaryWriter(m_fs);
                 m_bw.Seek(0, SeekOrigin.Begin);
             }

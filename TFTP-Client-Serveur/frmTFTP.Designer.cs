@@ -212,7 +212,6 @@
             // 
             // btnRecevoirClient
             // 
-            this.btnRecevoirClient.Enabled = false;
             this.btnRecevoirClient.Location = new System.Drawing.Point(346, 117);
             this.btnRecevoirClient.Name = "btnRecevoirClient";
             this.btnRecevoirClient.Size = new System.Drawing.Size(75, 23);
