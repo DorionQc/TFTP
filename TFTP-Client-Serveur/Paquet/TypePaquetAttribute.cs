@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace TFTP_Client_Serveur.Paquet
 {
+    // Attribut de classe qui définit le type d'un paquet (ex. [TypePaquet(TypePaquet.WRQ)])
     public sealed class TypePaquetAttribute : Attribute
     {
         private readonly TypePaquet m_Type;

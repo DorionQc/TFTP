@@ -16,9 +16,6 @@ namespace TFTP_Client_Serveur.Paquet
     [TypePaquet(TypePaquet.DATA)]
     public class DataPaquet : absPaquet
     {
-        /*// Ce champ doit OBLIGATOIREMENT exister pour que le paquet soit reconnu.
-        public static TypePaquet TYPEPAQUET = TypePaquet.DATA;*/
-
         private ushort m_NoBlock;
         private byte[] m_Data;
         private bool m_Dernier;

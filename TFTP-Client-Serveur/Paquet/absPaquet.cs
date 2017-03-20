@@ -13,6 +13,9 @@ using System.Reflection;
 
 namespace TFTP_Client_Serveur.Paquet
 {
+    /// <summary>
+    /// Types de paquets
+    /// </summary>
     public enum TypePaquet : byte
     {
         NULL = 0,
@@ -23,17 +26,22 @@ namespace TFTP_Client_Serveur.Paquet
         ERROR = 5
     };
 
+    /// <summary>
+    /// Classe parent de tout paquet
+    /// </summary>
     public abstract class absPaquet
     {
         public TypePaquet Type;
 
         protected absPaquet() { }
 
+        // Type de paquet
         protected absPaquet(TypePaquet Type)
         {
             this.Type = Type;
         }
 
+        // Décode (statiquement) un tableau de bytes, pour y avoir une instance d'un paquet
         public static bool  Decoder(byte[] Data, out absPaquet Paquet)
         {
             Paquet = null;
@@ -48,16 +56,20 @@ namespace TFTP_Client_Serveur.Paquet
 
             type = (TypePaquet)Data[1];
 
+            // Un petit peu de cassage de tête (J'avais bien l'intention de tout faire par réflection, mais bon..)
             IEnumerator<Type> Enumerator = s_lClassesEnfant.GetEnumerator();
-            while (Enumerator.MoveNext())// && Paquet == null) c'est toujours vrai de toutes façons
+            while (Enumerator.MoveNext())
             {
                 t = Enumerator.Current;
+                // Recherche du bon type de trame
                 if (getTypePaquet(t) == type)
                 {
+                    // Lorsqu'on le trouve, on l'instancie
                     paquetInst = Activator.CreateInstance(t);
                     if (paquetInst is absPaquet)
                     {
                         Paquet = (absPaquet)paquetInst;
+                        // Si le paquet est décodable (le format est bon)
                         if (!Paquet.Decode(Data))
                             return false;
                         return true;
@@ -68,6 +80,7 @@ namespace TFTP_Client_Serveur.Paquet
             return false;
         }
 
+        // Encode statiquement un paquet pour y avoir le tableau d'octets
         public static bool Encoder(absPaquet Paquet, out byte[] Data)
         {
             return Paquet.Encode(out Data);

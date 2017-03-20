@@ -28,17 +28,19 @@ namespace TFTP_Client_Serveur.Serveur
             Demarrer();
         }
 
+        // Méthode principale du thread
         protected override void Communication()
         {
             int len;
             bool AckRecu;
-            byte[] buffer = new byte[516];
+            byte[] TamponReception = new byte[516];
             long NumeroPaquet = 1;
             byte NbEssais = 0;
             Continuer = true;
+            // Paquet reçu
             absPaquet recu;
-            AckPaquet ack;
             DataPaquet data;
+            // Temps de l'envoi du paquet
             DateTime temps;
 
 
@@ -48,7 +50,7 @@ namespace TFTP_Client_Serveur.Serveur
 
             logger.Log(ConsoleSource.Serveur, "Nouvelle connection RRQ vers " + m_DistantEP);
 
-
+            // Si le fichier n'existe pas, on abandonne
             if (!File.Exists(m_NomFichier))
             {
                 Envoyer(new ErrorPaquet(CodeErreur.FileNotFound, "Impossible de trouver le fichier"));
@@ -57,6 +59,8 @@ namespace TFTP_Client_Serveur.Serveur
                 Terminer();
                 return;
             }
+
+            // Si le fichier n'est pas ouvrable, on abandonne
             try {
                 m_fs = new FileStream(m_NomFichier, FileMode.Open, FileAccess.Read);
                 m_br = new BinaryReader(m_fs);
@@ -69,7 +73,6 @@ namespace TFTP_Client_Serveur.Serveur
                 Terminer();
                 return;
             }
-        //    BinaryReader br = new BinaryReader(m_fs);
 
             while (Continuer)
             {
@@ -80,15 +83,18 @@ namespace TFTP_Client_Serveur.Serveur
                 AckRecu = false;
                 NbEssais++;
 
+                // Timeout (manuel), on attend pour le ACK pendant ~5 secondes
                 while (!AckRecu && DateTime.Now.Ticks - temps.Ticks < 50000000)
                 {
                     if (Socket.Available == 0)
                         Thread.Sleep(0);
                     else
                     {
-                        len = Socket.ReceiveFrom(buffer, ref m_DistantEP);
-                        if (len != 0 && absPaquet.Decoder(buffer, out recu))
+                        // On a reçu quelque chose!
+                        len = Socket.ReceiveFrom(TamponReception, ref m_DistantEP);
+                        if (len != 0 && absPaquet.Decoder(TamponReception, out recu))
                         {
+                            // Paquet valide et de type ACK
                             if (recu.Type == TypePaquet.ACK && ((AckPaquet)recu).NoBlock == (ushort)NumeroPaquet)
                             {
                                 //logger.Log(ConsoleSource.Serveur, "Réception du ACK du paquet #" + ((AckPaquet)recu).NoBlock.ToString());
@@ -98,6 +104,7 @@ namespace TFTP_Client_Serveur.Serveur
                                 if (data.EstDernier)
                                     Continuer = false;
                             }
+                            // Paquet valide et de type ERROR
                             else if (recu.Type == TypePaquet.ERROR)
                             {
                                 logger.Log(ConsoleSource.Serveur, "Erreur reçue.");
@@ -107,10 +114,11 @@ namespace TFTP_Client_Serveur.Serveur
                         }
                     }
                 }
-
-                if (NbEssais == 10)
+                // Timeout dépassé
+                if (NbEssais == 10 && !AckRecu)
                     Continuer = false;
             }
+            // Fin du thread, fermeture du socket et du fichier
             Event.Set();
             Terminer();
         }

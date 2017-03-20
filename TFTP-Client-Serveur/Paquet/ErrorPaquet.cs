@@ -28,8 +28,6 @@ namespace TFTP_Client_Serveur.Paquet
     [TypePaquet(TypePaquet.ERROR)]
     public class ErrorPaquet : absPaquet
     {
-        /*// Ce champ doit OBLIGATOIREMENT exister pour que le paquet soit reconnu.
-        public static TypePaquet TYPEPAQUET = TypePaquet.ERROR;*/
 
         private CodeErreur m_CodeErreur;
         private string m_MessageErreur;
