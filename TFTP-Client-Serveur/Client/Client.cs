@@ -76,7 +76,7 @@ namespace TFTP_Client_Serveur.Client
             }
 
             // Close Socket and release resources
-            logger.Log(ConsoleSource.Client, Encoding.ASCII.GetString(TamponDeReception, 4, TamponDeReception.Length - 5).Trim('\0'));
+            logger.Log(ConsoleSource.Client, Encoding.GetEncoding(437).GetString(TamponDeReception, 4, TamponDeReception.Length - 5).Trim('\0'));
             SocketTFTP.Close();
             fs.Close();
         }
@@ -89,7 +89,7 @@ namespace TFTP_Client_Serveur.Client
         public void WRQ(string FichierDistantClient, string FichierLocalClient)
         {
             ushort NumeroPaquet = 0;
-
+            int len;
             IPEndPoint serverEP;
             byte[] TamponDEnvoi;
             byte[] TamponDeReception = new byte[516];
@@ -104,25 +104,22 @@ namespace TFTP_Client_Serveur.Client
             EndPoint donnesEP = serverEP;
             Socket SocketTFTP = new Socket(serverEP.Address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
             
-            SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
+            len = SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
             SocketTFTP.ReceiveTimeout = 1000;
             SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
             
             serverEP.Port = ((IPEndPoint)donnesEP).Port;
 
-            while (TamponDeReception[1] != (byte)TypePaquet.ERROR && TamponDEnvoi.Length == 516)
+            while (TamponDeReception[1] != (byte)TypePaquet.ERROR && len == 516)
             {
                 if ((TamponDeReception[1] == (byte)TypePaquet.ACK) && (((TamponDeReception[2] << 8) & 0xff00) | TamponDeReception[3]) == NumeroPaquet)
                 {
                     new DataPaquet(++NumeroPaquet, fs.ReadBytes(512)).Encode(out TamponDEnvoi);
 
-                    SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
+                    len = SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
                 }
                 
-                if (TamponDEnvoi.Length == 516)
-                {
-                    SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
-                }
+                SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
             }
 
             // Close Socket and release resources
