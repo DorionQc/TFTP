@@ -5,17 +5,9 @@
  **********************************/
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Net;
-using System.Net.Sockets;
 using TFTP_Client_Serveur.Client;
 
 //using TFTP_Client_Serveur.Client;
@@ -122,7 +114,7 @@ namespace TFTP_Client_Serveur
         private void btnEnvoyerClient_Click(object sender, EventArgs e)
         {
             
-            Client.ClientTFTP client = new ClientTFTP(txtIPClient.Text,69);
+            Client.ClientTFTP client = new ClientTFTP(txtIPClient.Text);
             client.WRQ(txtFichierDistantClient.Text,txtDossierClient.Text + "/" + txtFichierLocalClient.Text);
         }
 

@@ -5,11 +5,7 @@
  **********************************/
  
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
 namespace TFTP_Client_Serveur.Paquet
 {
@@ -21,7 +17,6 @@ namespace TFTP_Client_Serveur.Paquet
 
         private ushort m_NoBlock;
         private byte[] m_Data;
-        private bool m_Dernier;
 
         public DataPaquet() { }
 

@@ -5,11 +5,7 @@
  **********************************/
  
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
 namespace TFTP_Client_Serveur.Paquet
 {
@@ -62,7 +58,7 @@ namespace TFTP_Client_Serveur.Paquet
             if (Data[0] != 0 || Data[1] != (byte)TypePaquet.ERROR)
                 return false;
             CodeErreur = BitConverter.ToUInt16(Data, 2);
-            if (CodeErreur < 0 || CodeErreur > 7)
+            if (CodeErreur > 7)
                 return false;
             i = 4;
             sb = new StringBuilder();
