@@ -39,7 +39,7 @@ namespace TFTP_Client_Serveur.Serveur
 
             // Au cas où...
             Event.WaitOne();
-           // Event.Reset();
+            Event.Reset();
 
             logger.Log(ConsoleSource.Serveur, "Nouvelle connection WRQ vers " + m_DistantEP);
 

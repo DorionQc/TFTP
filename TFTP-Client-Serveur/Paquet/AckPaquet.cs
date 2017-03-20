@@ -9,9 +9,6 @@ namespace TFTP_Client_Serveur.Paquet
     [TypePaquet(TypePaquet.ACK)]
     public class AckPaquet : absPaquet
     {
-        /*// Ce champ doit OBLIGATOIREMENT exister pour que le paquet soit reconnu.
-        public static TypePaquet TYPEPAQUET = TypePaquet.ACK;*/
-
         private ushort m_NoBlock;
 
         public AckPaquet() { }

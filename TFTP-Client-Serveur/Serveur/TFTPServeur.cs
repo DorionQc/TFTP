@@ -145,6 +145,7 @@ namespace TFTP_Client_Serveur.Serveur
 
                     if (len != 0)
                     {
+                        // Trop de connections!!
                         if (m_lConnection.Count >= LIMITECONNECTION)
                         {
                             logger.Log(ConsoleSource.Serveur, "Une connection a tenté d'être établie, mais le serveur est surchargé.");
@@ -153,18 +154,21 @@ namespace TFTP_Client_Serveur.Serveur
                         {
                             if (absPaquet.Decoder(buffer, out paquet))
                             {
+                                // RRQ
                                 if (paquet.Type == TypePaquet.RRQ)
                                 {
                                     m_lConnection.Add(new ServeurRRQ(Path.Combine(m_Dossier.FullName, ((RRQPaquet)paquet).Fichier),
                                         DistantEP,
                                         new IPEndPoint(((IPEndPoint)m_LocalEP).Address, 0)));
                                 }
+                                // WRQ
                                 else if (paquet.Type == TypePaquet.WRQ)
                                 {
                                     m_lConnection.Add(new ServeurWRQ(Path.Combine(m_Dossier.FullName, ((WRQPaquet)paquet).Fichier),
                                         DistantEP,
                                         new IPEndPoint(((IPEndPoint)m_LocalEP).Address, 0)));
                                 }
+                                // Quelque chose d'autre
                                 else
                                 {
                                     logger.Log(ConsoleSource.Serveur, "Un message illisible a été transmis.");
@@ -198,6 +202,10 @@ namespace TFTP_Client_Serveur.Serveur
             logger.Log(ConsoleSource.Serveur, "Serveur arrêté");
         }
 
+        /// <summary>
+        /// Enlève une connection de la liste
+        /// </summary>
+        /// <param name="c">Connection à enlever</param>
         public void EnleverConnection(Connection c)
         {
             m_lConnection.Remove(c);

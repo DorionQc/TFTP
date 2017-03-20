@@ -75,19 +75,24 @@ namespace TFTP_Client_Serveur
 
         private void btnDemarrerServeur_Click(object sender, EventArgs e)
         {
-            
+            // Démarre le serveur!
+            // Lecture de l'IP
             if (m_AdresseLocale == null)
             {
                 logger.Log(ConsoleSource.Interface, "Veuillez choisir une adresse IP avant de créer le serveur.");
                 return;
             }
+            // Lecture du dossier
             if (m_DossierLocalServeur == null || !m_DossierLocalServeur.Exists)
             {
                 logger.Log(ConsoleSource.Interface, "Le dossier désigné pour le serveur n'est pas valide.");
                 return;
             }
+
+            // Instanciation du singleton de serveur (qui ne devrait pas être un singleton, honnêtement)
             m_Serveur = TFTPServeur.INSTANCE;
             m_Serveur.Init(m_AdresseLocale, m_DossierLocalServeur);
+
             btnDemarrerServeur.Enabled = false;
             btnArreterServeur.Enabled = true;
             cbIPServeur.Enabled = false;
@@ -99,6 +104,7 @@ namespace TFTP_Client_Serveur
 
         private void btnArreterServeur_Click(object sender, EventArgs e)
         {
+            // Arrêt du serveur
             if (m_Serveur != null && m_Serveur.Initialised)
             {
                 btnDemarrerServeur.Enabled = true;
@@ -114,7 +120,8 @@ namespace TFTP_Client_Serveur
         private void btnEnvoyerClient_Click(object sender, EventArgs e)
         {
             
-            Client.ClientTFTP client = new ClientTFTP(txtIPClient.Text);
+
+            ClientTFTP client = new ClientTFTP(txtIPClient.Text);
             client.WRQ(txtFichierDistantClient.Text,txtDossierClient.Text + "/" + txtFichierLocalClient.Text);
         }
 
@@ -138,7 +145,7 @@ namespace TFTP_Client_Serveur
 
         private void btnDossierServeur_Click(object sender, EventArgs e)
         {
-            // Couton pour choisir le dossier du côté serveur
+            // Bouton pour choisir le dossier du côté serveur
             DirectoryInfo temp;
             if (DialogueDossier(out temp))
             {
