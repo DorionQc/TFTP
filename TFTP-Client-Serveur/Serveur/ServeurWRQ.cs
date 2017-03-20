@@ -5,11 +5,7 @@
  **********************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.IO;
 using System.Threading;
 
@@ -38,7 +34,6 @@ namespace TFTP_Client_Serveur.Serveur
             Continuer = true;
             absPaquet recu;
             AckPaquet ack;
-            DataPaquet data;
             DateTime temps;
 
 

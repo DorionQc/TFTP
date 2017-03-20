@@ -14,11 +14,7 @@
 
  */
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
@@ -46,8 +42,7 @@ namespace TFTP_Client_Serveur.Serveur
 
         // Port à utiliser (TFTP utilise 69 par défaut)
         private const int PORT = 69;
-        // Longueur du timeout, avant d'abandonner une connection, en ms
-        private const int TIMEOUT = 2000; //Le timeout ne marche pas
+
         // Nombre de connections limite
         private const int LIMITECONNECTION = 30;
 
@@ -132,7 +127,7 @@ namespace TFTP_Client_Serveur.Serveur
 
             // Tampon de réception
             byte[] buffer = new byte[512];
-            int len = 0;
+            int len;
 
             absPaquet paquet;
 
