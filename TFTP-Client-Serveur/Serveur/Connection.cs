@@ -98,8 +98,6 @@ namespace TFTP_Client_Serveur.Serveur
 
         public void Terminer()
         {
-            if (!Continuer)
-                return;
             Continuer = false;
             Event.WaitOne();
             m_br?.Close();
