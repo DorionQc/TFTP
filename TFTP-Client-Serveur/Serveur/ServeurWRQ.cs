@@ -51,6 +51,7 @@ namespace TFTP_Client_Serveur.Serveur
 
             if (!File.Exists(m_NomFichier))
             {
+
                 try
                 {
                     m_fs = File.Create(m_NomFichier);
