@@ -4,6 +4,7 @@
  * 2017
  **********************************/
 
+using System;
 using System.Threading;
 using System.Net.Sockets;
 using System.Net;
@@ -172,7 +173,7 @@ namespace TFTP_Client_Serveur.Serveur
             byte[] Data;
             paquet.Encode(out Data);
             Socket.SendTo(Data, m_DistantEP);
-            //logger.Log(ConsoleSource.Serveur, "Envoi du packet " + paquet.ToString());
+            logger.Log(ConsoleSource.Serveur, "Envoi du packet " + paquet.ToString());
         }
 
     }

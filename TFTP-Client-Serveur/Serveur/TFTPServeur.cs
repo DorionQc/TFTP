@@ -4,16 +4,17 @@
  * 2017
  **********************************/
 
- /*
+/*
 
-    #TODO
-    Vérification de la validité des paquets
-    Code d'erreur
-    Serveur
-    Client
+   #TODO
+   Vérification de la validité des paquets
+   Code d'erreur
+   Serveur
+   Client
 
- */
+*/
 
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -141,7 +142,16 @@ namespace TFTP_Client_Serveur.Serveur
                     Thread.Sleep(0);
                 else
                 {
-                    len = m_ListenerSocket.ReceiveFrom(buffer, 0, 512, SocketFlags.None, ref DistantEP);
+                    try
+                    {
+                        len = m_ListenerSocket.ReceiveFrom(buffer, 0, 512, SocketFlags.None, ref DistantEP);
+                    }
+                    catch (Exception ex)
+                    {
+                        m_Continue = false;
+                        logger.Log(ConsoleSource.Serveur, ex.Message);
+                        break;
+                    }
 
                     if (len != 0)
                     {

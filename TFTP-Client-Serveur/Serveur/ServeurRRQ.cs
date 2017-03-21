@@ -87,13 +87,22 @@ namespace TFTP_Client_Serveur.Serveur
                     else
                     {
                         // On a reçu quelque chose!
-                        len = Socket.ReceiveFrom(TamponReception, ref m_DistantEP);
+                        try
+                        {
+                            len = Socket.ReceiveFrom(TamponReception, ref m_DistantEP);
+                        }
+                        catch (Exception ex)
+                        {
+                            Continuer = false;
+                            logger.Log(ConsoleSource.Serveur, ex.Message);
+                            break;
+                        }
                         if (len != 0 && absPaquet.Decoder(TamponReception, out recu))
                         {
                             // Paquet valide et de type ACK
                             if (recu.Type == TypePaquet.ACK && ((AckPaquet)recu).NoBlock == (ushort)NumeroPaquet)
                             {
-                                //logger.Log(ConsoleSource.Serveur, "Réception du ACK du paquet #" + ((AckPaquet)recu).NoBlock.ToString());
+                                logger.Log(ConsoleSource.Serveur, "Réception du ACK du paquet #" + ((AckPaquet)recu).NoBlock.ToString());
                                 AckRecu = true;
                                 NbEssais = 0;
                                 NumeroPaquet++;

@@ -15,7 +15,7 @@ namespace TFTP_Client_Serveur.Client
         private string IPServeurTFTP = "";
         protected Logger logger = Logger.INSTANCE;
 
-        
+
 
         /// <summary>
         /// Telecharge le fichier distant specifie
@@ -36,27 +36,27 @@ namespace TFTP_Client_Serveur.Client
 
             BinaryWriter fs =
                 new BinaryWriter(new FileStream(FichierLocalClient, FileMode.Create, FileAccess.Write, FileShare.Read));
-           
-            
-            
+
+
+
             serverEP = new IPEndPoint(IPAddress.Parse(IPServeurTFTP), PortServeurTFTP);
-            
-            
+
+
 
             EndPoint donnesEP = serverEP;
             Socket SocketTFTP = new Socket(serverEP.Address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
 
             //Demande le premier packet de data
             SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
-            SocketTFTP.ReceiveTimeout = 5000;
+            SocketTFTP.ReceiveTimeout = 15000;
             //Dans un monde ideal, recoit le premier packet de data
             len = SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
-            
+
             serverEP.Port = ((IPEndPoint)donnesEP).Port;
 
             while (TamponDeReception[1] != (byte)TypePaquet.ERROR && len == 516)
             {
-               
+
                 // S'attend a recevoir le packet suivant
                 if ((((TamponDeReception[2] << 8) & 0xff00) | TamponDeReception[3]) == NumeroPaquet)
                 {
@@ -64,19 +64,23 @@ namespace TFTP_Client_Serveur.Client
                     fs.Write(TamponDeReception, 4, len - 4);
 
                     // Envoi un Ack correspondant au packet recu
-                    new AckPaquet(NumeroPaquet++).Encode(out TamponDEnvoi);
-                    SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
+                    
                 }
                 // check si le c'etait le dernier packet
                 if (len == 516)
                 {
                     // Receive Next Data Packet From TFTP Server
                     len = SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
+                    new AckPaquet(NumeroPaquet++).Encode(out TamponDEnvoi);
+                    SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
                 }
             }
 
             // Close Socket and release resources
-            logger.Log(ConsoleSource.Client, Encoding.GetEncoding(437).GetString(TamponDeReception, 4, TamponDeReception.Length - 5).Trim('\0'));
+            if (TamponDeReception[1] == (byte)TypePaquet.ERROR)
+            {
+                logger.Log(ConsoleSource.Client, Encoding.GetEncoding(437).GetString(TamponDeReception, 4, TamponDeReception.Length - 5).Trim('\0'));
+            }
             SocketTFTP.Close();
             fs.Close();
         }
@@ -89,7 +93,7 @@ namespace TFTP_Client_Serveur.Client
         public void WRQ(string FichierDistantClient, string FichierLocalClient)
         {
             ushort NumeroPaquet = 0;
-            int len;
+            int len = 516;
             IPEndPoint serverEP;
             byte[] TamponDEnvoi;
             byte[] TamponDeReception = new byte[516];
@@ -103,11 +107,11 @@ namespace TFTP_Client_Serveur.Client
             serverEP = new IPEndPoint(IPAddress.Parse(IPServeurTFTP), PortServeurTFTP);
             EndPoint donnesEP = serverEP;
             Socket SocketTFTP = new Socket(serverEP.Address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-            
-            len = SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
+
+            SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
             SocketTFTP.ReceiveTimeout = 1000;
             SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
-            
+
             serverEP.Port = ((IPEndPoint)donnesEP).Port;
 
             while (TamponDeReception[1] != (byte)TypePaquet.ERROR && len == 516)
@@ -118,7 +122,7 @@ namespace TFTP_Client_Serveur.Client
 
                     len = SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
                 }
-                
+
                 SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
             }
 
