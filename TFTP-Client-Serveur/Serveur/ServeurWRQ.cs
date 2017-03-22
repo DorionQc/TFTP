@@ -88,7 +88,17 @@ namespace TFTP_Client_Serveur.Serveur
                         Thread.Sleep(0);
                     else
                     {
-                        len = Socket.ReceiveFrom(buffer, ref m_DistantEP);
+                        try
+                        {
+                            len = Socket.ReceiveFrom(buffer, ref m_DistantEP);
+                        }
+                        catch (Exception ex)
+                        {
+                            Continuer = false;
+                            logger.Log(ConsoleSource.Serveur, ex.Message);
+                            break;
+                        }
+
                         if (len != 0 && absPaquet.Decoder(buffer, out recu))
                         {
                             NumeroPaquet++;
