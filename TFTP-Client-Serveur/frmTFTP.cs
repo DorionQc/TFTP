@@ -8,6 +8,8 @@ using System;
 using System.Windows.Forms;
 using System.IO;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using TFTP_Client_Serveur.Client;
 
 //using TFTP_Client_Serveur.Client;
@@ -119,16 +121,28 @@ namespace TFTP_Client_Serveur
 
         private void btnEnvoyerClient_Click(object sender, EventArgs e)
         {
-            
 
-            ClientTFTP client = new ClientTFTP(txtIPClient.Text);
-            client.WRQ(txtFichierDistantClient.Text,txtDossierClient.Text + "/" + txtFichierLocalClient.Text);
+            new Task(() =>
+            {
+                ClientTFTP client = new ClientTFTP(txtIPClient.Text);
+                client.WRQ(txtFichierDistantClient.Text,
+                    txtDossierClient.Text + "/" + txtFichierLocalClient.Text);
+            }).Start();
+            Thread.Sleep(0);
+
+
         }
 
         private void btnRecevoirClient_Click(object sender, EventArgs e)
         {
-            ClientTFTP client = new ClientTFTP(txtIPClient.Text);
-            client.RRQ(txtFichierDistantClient.Text, txtDossierClient.Text + "/" + txtFichierLocalClient.Text);
+            new Task(() =>
+            {
+                ClientTFTP client = new ClientTFTP(txtIPClient.Text);
+                client.RRQ(txtFichierDistantClient.Text,
+                    txtDossierClient.Text + "/" + txtFichierLocalClient.Text);
+            }).Start();
+            Thread.Sleep(0);
+
         }
 
         private void btnDossierClient_Click(object sender, EventArgs e)
