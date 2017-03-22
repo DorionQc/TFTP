@@ -82,7 +82,7 @@ namespace TFTP_Client_Serveur.Serveur
                 PacketRecu = false;
                 NbEssais++;
 
-                while (!PacketRecu && DateTime.Now.Ticks - temps.Ticks < 5000000)
+                while (!PacketRecu && DateTime.Now.Ticks - temps.Ticks < 50000000)
                 {
                     if (Socket.Available == 0)
                         Thread.Sleep(0);
@@ -104,7 +104,7 @@ namespace TFTP_Client_Serveur.Serveur
                             NumeroPaquet++;
                             if (recu.Type == TypePaquet.DATA && ((DataPaquet) recu).NoBlock == (ushort) NumeroPaquet)
                             {
-                                //logger.Log(ConsoleSource.Serveur, "Réception du ACK du paquet #" + ((AckPaquet)recu).NoBlock.ToString());
+                                logger.Log(ConsoleSource.Serveur, "Réception du paquet #" + ((DataPaquet)recu).NoBlock.ToString());
                                 PacketRecu = true;
                                 NbEssais = 0;
                                // NumeroPaquet++;
@@ -134,6 +134,7 @@ namespace TFTP_Client_Serveur.Serveur
                     Continuer = false;
                 // Envoi des acks
                 ack = new AckPaquet((ushort)NumeroPaquet);
+                logger.Log(ConsoleSource.Serveur, "Envoi du ACK #" + NumeroPaquet);
                 Envoyer(ack);
             }
             m_bw.Close();
