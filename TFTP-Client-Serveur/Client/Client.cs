@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using TFTP_Client_Serveur.Paquet;
 
@@ -27,16 +29,24 @@ namespace TFTP_Client_Serveur.Client
             int len;
             ushort NumeroPaquet = 1;
             byte[] TamponDEnvoi;
+            BinaryWriter fs;
             IPEndPoint serverEP;
             byte[] TamponDeReception = new byte[516];
             if (!new RRQPaquet(FichierDistantClient).Encode(out TamponDEnvoi))
             {
                 return;
             }
-
-            BinaryWriter fs =
-                new BinaryWriter(new FileStream(FichierLocalClient, FileMode.Create, FileAccess.Write, FileShare.Read));
-
+            try
+            {
+               fs =
+                    new BinaryWriter(new FileStream(FichierLocalClient, FileMode.Create, FileAccess.Write,
+                        FileShare.Read));
+            }
+            catch (Exception e)
+            {
+                logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                return;
+            }
 
 
             serverEP = new IPEndPoint(IPAddress.Parse(IPServeurTFTP), PortServeurTFTP);
@@ -45,13 +55,20 @@ namespace TFTP_Client_Serveur.Client
 
             EndPoint donnesEP = serverEP;
             Socket SocketTFTP = new Socket(serverEP.Address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-
+            SocketTFTP.Bind(new IPEndPoint(0, 0));
             //Demande le premier packet de data
             SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
             SocketTFTP.ReceiveTimeout = 15000;
             //Dans un monde ideal, recoit le premier packet de data
-            len = SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
-
+            try
+            {
+                len = SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
+            }
+            catch (Exception e)
+            {
+                logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                return;
+            }
             serverEP.Port = ((IPEndPoint)donnesEP).Port;
 
             while (TamponDeReception[1] != (byte)TypePaquet.ERROR && len == 516)
@@ -64,16 +81,26 @@ namespace TFTP_Client_Serveur.Client
                     fs.Write(TamponDeReception, 4, len - 4);
 
                     // Envoi un Ack correspondant au packet recu
-                    
+                    new AckPaquet(NumeroPaquet).Encode(out TamponDEnvoi);
+                    SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
+                    NumeroPaquet++;
                 }
                 // check si le c'etait le dernier packet
                 if (len == 516)
                 {
                     // Receive Next Data Packet From TFTP Server
-                    len = SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
-                    new AckPaquet(NumeroPaquet++).Encode(out TamponDEnvoi);
-                    SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
+                    try
+                    {
+                        len = SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                        return;
+                    }
                 }
+                new AckPaquet((ushort)(((TamponDeReception[2] << 8) & 0xff00) | TamponDeReception[3])).Encode(out TamponDEnvoi);
+                SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
             }
 
             // Close Socket and release resources
@@ -94,6 +121,7 @@ namespace TFTP_Client_Serveur.Client
         {
             ushort NumeroPaquet = 0;
             int len = 516;
+            BinaryReader fs;
             IPEndPoint serverEP;
             byte[] TamponDEnvoi;
             byte[] TamponDeReception = new byte[516];
@@ -102,28 +130,63 @@ namespace TFTP_Client_Serveur.Client
             {
                 return;
             }
-
-            BinaryReader fs = new BinaryReader(new FileStream(FichierLocalClient, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+            try
+            {
+                fs = new BinaryReader(new FileStream(FichierLocalClient, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+            }
+            catch (Exception e)
+            {
+                logger.Log(ConsoleSource.Client, "Erreur: "+e.Message);
+                return;
+            }
+            
             serverEP = new IPEndPoint(IPAddress.Parse(IPServeurTFTP), PortServeurTFTP);
-            EndPoint donnesEP = serverEP;
-            Socket SocketTFTP = new Socket(serverEP.Address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
 
+
+            EndPoint donnesEP = new IPEndPoint(IPAddress.Any, 0);
+            Socket SocketTFTP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            SocketTFTP.Bind(donnesEP);
+            SocketTFTP.ReceiveTimeout = 15000;
             SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
-            SocketTFTP.ReceiveTimeout = 1000;
-            SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
+           
 
-            serverEP.Port = ((IPEndPoint)donnesEP).Port;
 
+            try
+            {
+                SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
+            }
+            catch (Exception e)
+            {
+                logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                return;
+            }
+            
             while (TamponDeReception[1] != (byte)TypePaquet.ERROR && len == 516)
             {
-                if ((TamponDeReception[1] == (byte)TypePaquet.ACK) && (((TamponDeReception[2] << 8) & 0xff00) | TamponDeReception[3]) == NumeroPaquet)
+                if ((TamponDeReception[1] == (byte) TypePaquet.ACK) &&
+                    (((TamponDeReception[2] << 8) & 0xff00) | TamponDeReception[3]) == NumeroPaquet)
                 {
                     new DataPaquet(++NumeroPaquet, fs.ReadBytes(512)).Encode(out TamponDEnvoi);
-
-                    len = SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, serverEP);
+                    try
+                    {
+                        len = SocketTFTP.SendTo(TamponDEnvoi, TamponDEnvoi.Length, SocketFlags.None, donnesEP);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                        return;
+                    }
                 }
 
-                SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
+                try
+                {
+                    SocketTFTP.ReceiveFrom(TamponDeReception, ref donnesEP);
+                }
+                catch (Exception e)
+                {
+                    logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                    return;
+                }
             }
 
             // Close Socket and release resources
