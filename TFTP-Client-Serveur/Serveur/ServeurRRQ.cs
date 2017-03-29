@@ -102,7 +102,7 @@ namespace TFTP_Client_Serveur.Serveur
                             // Paquet valide et de type ACK
                             if (recu.Type == TypePaquet.ACK && ((AckPaquet)recu).NoBlock == (ushort)NumeroPaquet)
                             {
-                                logger.Log(ConsoleSource.Serveur, "Réception du ACK du paquet #" + ((AckPaquet)recu).NoBlock.ToString());
+                                //logger.Log(ConsoleSource.Serveur, "Réception du ACK du paquet #" + ((AckPaquet)recu).NoBlock.ToString());
                                 AckRecu = true;
                                 NbEssais = 0;
                                 NumeroPaquet++;

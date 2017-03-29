@@ -192,6 +192,11 @@ namespace TFTP_Client_Serveur.Serveur
                             else
                             {
                                 logger.Log(ConsoleSource.Serveur, "Un message illisible a été transmis.");
+                                Socket ErreurSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                                ErreurSocket.Bind(new IPEndPoint(((IPEndPoint)m_LocalEP).Address, 0));
+                                byte[] data;
+                                (new ErrorPaquet(CodeErreur.IllegalOperation, "Seules les demandes RRQ et WRQ sont reconnues sur le port 69")).Encode(out data);
+                                ErreurSocket.SendTo(data, DistantEP);
                             }
                         }
                     }

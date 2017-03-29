@@ -67,6 +67,7 @@ namespace TFTP_Client_Serveur.Client
             catch (Exception e)
             {
                 logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                fs.Close();
                 return;
             }
             serverEP.Port = ((IPEndPoint)donnesEP).Port;
@@ -96,6 +97,7 @@ namespace TFTP_Client_Serveur.Client
                     catch (Exception e)
                     {
                         logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                        fs.Close();
                         return;
                     }
                 }
@@ -158,6 +160,7 @@ namespace TFTP_Client_Serveur.Client
             catch (Exception e)
             {
                 logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                fs.Close();
                 return;
             }
             
@@ -174,6 +177,7 @@ namespace TFTP_Client_Serveur.Client
                     catch (Exception e)
                     {
                         logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                        fs.Close();
                         return;
                     }
                 }
@@ -185,6 +189,7 @@ namespace TFTP_Client_Serveur.Client
                 catch (Exception e)
                 {
                     logger.Log(ConsoleSource.Client, "Erreur: " + e.Message);
+                    fs.Close();
                     return;
                 }
             }

@@ -56,7 +56,7 @@ namespace TFTP_Client_Serveur.Serveur
                 catch (Exception ex)
                 {
                     Envoyer(new ErrorPaquet(CodeErreur.AccessViolation, "Erreur lors de l'écriture du fichier : " + ex.Message));
-                    logger.Log(ConsoleSource.Serveur, "Erreur lors de l'écriture du fichier : " + ex.Message);
+                    //logger.Log(ConsoleSource.Serveur, "Erreur lors de l'écriture du fichier : " + ex.Message);
                     Event.Set();
                     Terminer();
                     return;
@@ -65,7 +65,7 @@ namespace TFTP_Client_Serveur.Serveur
             else
             {
                 Envoyer(new ErrorPaquet(CodeErreur.FileExists, "Le fichier existe déjà"));
-                logger.Log(ConsoleSource.Serveur, "Le fichier existe déjà");
+                //logger.Log(ConsoleSource.Serveur, "Le fichier existe déjà");
                 Event.Set();
                 Terminer();
                 return;
@@ -104,7 +104,7 @@ namespace TFTP_Client_Serveur.Serveur
                             NumeroPaquet++;
                             if (recu.Type == TypePaquet.DATA && ((DataPaquet) recu).NoBlock == (ushort) NumeroPaquet)
                             {
-                                logger.Log(ConsoleSource.Serveur, "Réception du paquet #" + ((DataPaquet)recu).NoBlock.ToString());
+                                //logger.Log(ConsoleSource.Serveur, "Réception du paquet #" + ((DataPaquet)recu).NoBlock.ToString());
                                 PacketRecu = true;
                                 NbEssais = 0;
                                // NumeroPaquet++;
@@ -134,7 +134,7 @@ namespace TFTP_Client_Serveur.Serveur
                     Continuer = false;
                 // Envoi des acks
                 ack = new AckPaquet((ushort)NumeroPaquet);
-                logger.Log(ConsoleSource.Serveur, "Envoi du ACK #" + NumeroPaquet);
+                //logger.Log(ConsoleSource.Serveur, "Envoi du ACK #" + NumeroPaquet);
                 Envoyer(ack);
             }
             m_bw.Close();
